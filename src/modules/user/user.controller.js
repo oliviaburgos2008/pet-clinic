@@ -1,78 +1,58 @@
-import { validateUser } from './user.schema.js';
+import { AppError } from '../../common/errors/appError.js';
+import { catchAsync } from '../../common/errors/catchAsync.js';
+import { validateUser, validatePartialUser } from './user.schema.js';
+import { UserService } from './user.service.js';
 
-export const register = async (req, res) => {
-  try {
-    const { hasError, errorMessages, userData } = validateUser(req.body);
+export const register = catchAsync(async (req, res, next) => {
+  const { hasError, errorMessages, userData } = validateUser(req.body);
 
-    if (hasError) {
-      return res.status(422).json({
-        status: 'error',
-        message: errorMessages,
-      });
-    }
+  // if (hasError) {
+  //   return res.status(422).json({
+  //     status: 'error',
+  //     message: errorMessages,
+  //   });
+  // }
 
-    return res.json(userData);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Something went very wrong! 🧨',
-      error,
+  const user = await UserService.create(req.body);
+
+  return res.status(201).json(user);
+});
+
+export const login = catchAsync(async (req, res) => {});
+
+export const findAllUser = catchAsync(async (req, res, next) => {
+  const users = await UserService.findAll();
+
+  return res.status(200).json(users);
+});
+
+export const findOneUser = catchAsync(async (req, res, next) => {
+  const { user } = req;
+
+  return res.status(200).json(user);
+});
+
+export const updateUser = catchAsync(async (req, res, next) => {
+  const { user } = req;
+
+  const { hasError, errorMessages, userData } = validatePartialUser(req.body);
+
+  if (hasError) {
+    return res.status(422).json({
+      status: 'error',
+      message: errorMessages,
     });
   }
-};
-export const login = async (req, res) => {
-  try {
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Something went very wrong! 🧨',
-      error,
-    });
-  }
-};
-export const findAllUser = async (req, res) => {
-  try {
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Something went very wrong! 🧨',
-      error,
-    });
-  }
-};
-export const findOneUser = async (req, res) => {
-  try {
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Something went very wrong! 🧨',
-      error,
-    });
-  }
-};
-export const updateUser = async (req, res) => {
-  try {
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Something went very wrong! 🧨',
-      error,
-    });
-  }
-};
-export const deleteUser = async (req, res) => {
-  try {
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Something went very wrong! 🧨',
-      error,
-    });
-  }
-};
+
+  const userUpdate = await UserService.update(user, userData);
+
+  return res.status(200).json(userUpdate);
+});
+
+export const deleteUser = catchAsync(async (req, res, next) => {
+  const { user } = req;
+
+  await UserService.delete(user);
+
+  return res.status(204).json();
+});

@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import { sequelize } from '../../config/database/database';
+import { sequelize } from '../../config/database/database.js';
 
 const User = sequelize.define('users', {
   id: {
@@ -49,7 +49,7 @@ const User = sequelize.define('users', {
   },
   passwordChangeAt: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
   },
   status: {
     type: DataTypes.BOOLEAN,
@@ -57,3 +57,5 @@ const User = sequelize.define('users', {
     allowNull: false,
   },
 });
+
+export default User;
